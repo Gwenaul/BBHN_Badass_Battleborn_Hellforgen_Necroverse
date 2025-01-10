@@ -29,23 +29,26 @@ class Player {
     this.height = 50;
     this.speed = 5;
     this.dy = 0; // Vitesse verticale (chute)
-    this.gravity = 0.5; // Gravité
-    this.jumpStrength = -15; // Force du saut
+    this.gravity = 0.75; // Gravité
+    this.jumpStrength = -17; // Force du saut
     this.isOnGround = false; // Indicateur si le joueur est sur une plateforme
     this.moveDirection = 0; // 1 pour droite, -1 pour gauche, 0 pour immobile
     this.color = "blue";
     this.bullets = [];
+    this.orientation = 1; //par defaut regarde a droite
   }
   move(direction) {
     if (direction === "left") this.moveDirection = -1;
     if (direction === "right") this.moveDirection = 1;
+    this.orientation = this.moveDirection;
   }
+
   stop() {
     this.moveDirection = 0;
   }
   shoot() {
     this.bullets.push(
-      new Bullet(this.x + this.width, this.y + this.height / 2)
+      new Bullet(this.orientation == -1? this.x:this.x + this.width, this.y + this.height / 2, this.orientation)
     );
   }
   jump() {
@@ -66,7 +69,8 @@ class Player {
         this.x < platform.x + platform.width &&
         this.x + this.width > platform.x &&
         this.y + this.height > platform.y &&
-        this.y + this.height < platform.y + platform.height
+        this.y + this.height < platform.y + platform.height &&
+        this.dy>0
       ) {
         this.dy = 0; // Arrête la chute
         this.isOnGround = true;
@@ -84,7 +88,7 @@ class Player {
       this.dy = 0;
       this.isOnGround = true;
     }
-    this.bullets.forEach((bullet) => bullet.update());
+    this.bullets.forEach((bullet) => bullet.update(this.orientation));
     this.bullets = this.bullets.filter((bullet) => !bullet.outOfBounds());
   }
   draw(ctx) {
@@ -95,12 +99,12 @@ class Player {
   }
 }
 class Bullet {
-  constructor(x, y) {
+  constructor(x, y, orientation) {
     this.x = x;
     this.y = y;
     this.width = 10;
     this.height = 5;
-    this.speed = 7;
+    this.speed = 7*orientation;
     this.color = "yellow";
   }
 
