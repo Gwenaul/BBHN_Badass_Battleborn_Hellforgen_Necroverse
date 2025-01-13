@@ -4,6 +4,7 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
+const minDistPlatform = 100;
 let lastTime = 0;
 let worldOffsetX = 0;
 function gameLoop(timestamp) {
@@ -25,6 +26,8 @@ class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
+    this.mustStop=false;
+    this.slowing=0.85;
     this.width = 50;
     this.height = 50;
     this.speed = 5;
@@ -38,13 +41,14 @@ class Player {
     this.orientation = 1; //par defaut regarde a droite
   }
   move(direction) {
+    this.mustStop=false;
     if (direction === "left") this.moveDirection = -1;
     if (direction === "right") this.moveDirection = 1;
     this.orientation = this.moveDirection;
   }
 
   stop() {
-    this.moveDirection = 0;
+    this.mustStop=true;
   }
   shoot() {
     this.bullets.push(
@@ -58,6 +62,14 @@ class Player {
     }
   }
   update() {
+    this.previousY=this.y;
+    let inertia = this.slowing;
+        //applique le stop lent
+        if(!this.isOnGround)inertia=this.slowing+0.12;
+    if(this.mustStop&&this.moveDirection!=0)
+        this.moveDirection*=inertia;
+      else this.mustStop=false;
+
     // Applique la gravité
     this.dy += this.gravity;
     this.y += this.dy;
@@ -65,17 +77,18 @@ class Player {
     // Détecter la collision avec chaque plateforme
     platforms.forEach((platform) => {
       // Vérifier la collision horizontale et verticale
-      if (
-        this.x < platform.x + platform.width &&
-        this.x + this.width > platform.x &&
-        this.y + this.height > platform.y &&
-        this.y + this.height < platform.y + platform.height &&
-        this.dy>0
-      ) {
-        this.dy = 0; // Arrête la chute
-        this.isOnGround = true;
-        this.y = platform.y - this.height; // Placer le joueur sur la plateforme
-      }
+        if (
+          this.x < platform.x + platform.width &&
+          this.x + this.width > platform.x &&
+          this.y + this.height > platform.y &&
+          this.y + this.height < platform.y + platform.height &&
+          this.previousY+this.height<=platform.y &&
+          this.dy>=0
+        ) {
+          this.dy = 0; // Arrête la chute
+          this.isOnGround = true;
+          this.y = platform.y - this.height; // Placer le joueur sur la plateforme
+        }
     });
     // Déplace le joueur horizontalement en fonction de la direction
     this.x += this.moveDirection * this.speed;
@@ -156,13 +169,13 @@ document.addEventListener("keydown", (event) => {
   if (event.key === " ") player.shoot(); // Touche espace pour tirer
 });
 document.addEventListener("keyup", (event) => {
-  if (event.key === "ArrowLeft" || event.key === "ArrowRight") player.stop(); // Arrêter le mouvement horizontal
+  if (event.key === "ArrowLeft" || event.key === "ArrowRight") if(!player.moveDirection==0&&!player.mustStop)player.stop(); // Arrêter le mouvement horizontal
 });
 function generatePlatform() {
   const platformWidth = Math.random() * 200 + 50; // Largeur entre 50 et 250 pixels
   const platformHeight = 20;
   const platformX = canvasWidth + Math.random() * 200; // Position hors écran (à droite)
-  const platformY = Math.random() * (canvasHeight - 200); // Hauteur aléatoire (évite le bas de l'écran)
+  const platformY = tryPlatform(); // Hauteur aléatoire (évite le bas de l'écran)
   return new Platform(platformX, platformY, platformWidth, platformHeight);
 }
 function generateEnemy(platform) {
@@ -171,12 +184,23 @@ function generateEnemy(platform) {
   return new Enemy(enemyX, enemyY, platform);
 }
 
+function tryPlatform(){
+  if(!tryPlatform)tryPlatform;
+  let isValid = null;
+  platforms.forEach((platform)=>{
+    isValid = Math.random() * (canvasHeight - 50);
+    if(isValid<platform.y+minDistPlatform&&isValid>platform.y-minDistPlatform)
+      isValid=null;
+  })
+  return isValid;
+}
+
 function update(deltaTime) {
   player.update();
   // Si le joueur dépasse le centre de l'écran
   if (player.x > canvasWidth / 2) {
     // Le joueur reste centré, et tout le reste défile
-    const scrollSpeed = player.speed;
+    const scrollSpeed = player.moveDirection*player.speed;
     player.x = canvasWidth / 2; // Garder le joueur au centre
     platforms.forEach((platform) => platform.update(scrollSpeed));
     enemies.forEach((enemy) => enemy.update(scrollSpeed));
