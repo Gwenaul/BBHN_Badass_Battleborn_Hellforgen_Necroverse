@@ -10,9 +10,10 @@ export class Enemy {
     this.color = "red";
   }
 
-  update(scrollSpeed = 0) {
+  update(scrollSpeed) {
     // Déplacement horizontal
     this.x += this.speed * this.direction;
+    
     // Changer de direction aux bords de la plateforme
     if (
       this.x <= this.platform.x ||
@@ -20,7 +21,6 @@ export class Enemy {
     ) {
       this.direction *= -1; // Inverser la direction
       // Appliquer le scrolling si nécessaire
-      this.x -= scrollSpeed;
             this.x = Math.max(
               this.platform.x,
               Math.min(

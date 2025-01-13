@@ -60,6 +60,10 @@ class Player {
       this.dy = this.jumpStrength; // Applique la force du saut
       this.isOnGround = false;
     }
+    else if(!this.hasDoubleJumped){
+      this.dy=this.jumpStrength
+      this.hasDoubleJumped = true;
+    }
   }
   update() {
     this.previousY=this.y;
@@ -82,12 +86,17 @@ class Player {
           this.x + this.width > platform.x &&
           this.y + this.height > platform.y &&
           this.y + this.height < platform.y + platform.height &&
-          this.previousY+this.height<=platform.y &&
-          this.dy>=0
+          this.previousY+this.height<=platform.y 
+          
         ) {
+          if(this.dy>=0){
+          
           this.dy = 0; // Arrête la chute
           this.isOnGround = true;
           this.y = platform.y - this.height; // Placer le joueur sur la plateforme
+          }
+          //peu importe l'inertie, double saut possible
+          this.hasDoubleJumped=false;
         }
     });
     // Déplace le joueur horizontalement en fonction de la direction
@@ -100,6 +109,7 @@ class Player {
       this.y = canvasHeight - this.height;
       this.dy = 0;
       this.isOnGround = true;
+      this.hasDoubleJumped=false;
     }
     this.bullets.forEach((bullet) => bullet.update(this.orientation));
     this.bullets = this.bullets.filter((bullet) => !bullet.outOfBounds());
@@ -172,10 +182,10 @@ document.addEventListener("keyup", (event) => {
   if (event.key === "ArrowLeft" || event.key === "ArrowRight") if(!player.moveDirection==0&&!player.mustStop)player.stop(); // Arrêter le mouvement horizontal
 });
 function generatePlatform() {
-  const platformWidth = Math.random() * 200 + 50; // Largeur entre 50 et 250 pixels
+  const platformWidth = Math.random() * 200 + 100; // Largeur entre 50 et 250 pixels
   const platformHeight = 20;
-  const platformX = canvasWidth + Math.random() * 200; // Position hors écran (à droite)
-  const platformY = tryPlatform(); // Hauteur aléatoire (évite le bas de l'écran)
+  const platformX = canvasWidth + Math.random() * canvasWidth; // Position hors écran (à droite)
+  const platformY = tryPlatform(platformX); // Hauteur aléatoire (évite le bas de l'écran)
   return new Platform(platformX, platformY, platformWidth, platformHeight);
 }
 function generateEnemy(platform) {
@@ -184,23 +194,38 @@ function generateEnemy(platform) {
   return new Enemy(enemyX, enemyY, platform);
 }
 
-function tryPlatform(){
-  if(!tryPlatform)tryPlatform;
-  let isValid = null;
-  platforms.forEach((platform)=>{
-    isValid = Math.random() * (canvasHeight - 50);
-    if(isValid<platform.y+minDistPlatform&&isValid>platform.y-minDistPlatform)
-      isValid=null;
-  })
-  return isValid;
+function tryPlatform(platformX) {
+    const maxHeight = canvasHeight * 0.85;
+    const minHeight = canvasHeight * 0.2; // Lower minimum to cover more screen
+    const minDistance = 150; // Combined minimum distance check
+    
+    // Generate base height in sections to ensure better distribution
+    const heightSection = (maxHeight - minHeight) / 3; // Split screen into 3 vertical sections
+    const section = Math.floor(Math.random() * 3); // Choose a random section
+    const proposedHeight = minHeight + (section * heightSection) + (Math.random() * heightSection);
+    
+    // Simple distance check from existing platforms
+    for (const platform of platforms) {
+        const distance = Math.sqrt(
+            Math.pow(platformX - platform.x, 2) + 
+            Math.pow(proposedHeight - platform.y, 2)
+        );
+        
+        if (distance < minDistance) {
+            // If too close to another platform, offset it upward or downward
+            return proposedHeight + minDistance;
+        }
+    }
+    
+    return proposedHeight;
 }
-
 function update(deltaTime) {
   player.update();
   // Si le joueur dépasse le centre de l'écran
   if (player.x > canvasWidth / 2) {
     // Le joueur reste centré, et tout le reste défile
     const scrollSpeed = player.moveDirection*player.speed;
+
     player.x = canvasWidth / 2; // Garder le joueur au centre
     platforms.forEach((platform) => platform.update(scrollSpeed));
     enemies.forEach((enemy) => enemy.update(scrollSpeed));
