@@ -1,3 +1,7 @@
+
+
+
+
 export class Enemy {
   constructor(x, y, platform) {
     this.x = x;
@@ -10,7 +14,7 @@ export class Enemy {
     this.color = "red";
   }
 
-  update(scrollSpeed) {
+  update() {
     // Déplacement horizontal
     this.x += this.speed * this.direction;
     
