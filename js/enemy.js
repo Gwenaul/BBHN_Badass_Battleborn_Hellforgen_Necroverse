@@ -37,7 +37,11 @@ export class Enemy {
   }
 
   draw(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+   // ctx.fillStyle = this.color;
+   let img = new Image();
+   img.src =
+     "./assets/images/first  sprite.png";
+ctx.drawImage(img, this.x,this.y, this.width, this.height);
+    //ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }
