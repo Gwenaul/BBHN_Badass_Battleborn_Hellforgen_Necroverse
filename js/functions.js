@@ -82,7 +82,7 @@ function update(deltaTime,player,platforms,enemies) {
   // Si le joueur dépasse le centre de l'écran
   if (player.x > canvasWidth / 2) {
     // Le joueur reste centré, et tout le reste défile
-    const scrollSpeed = player.moveDirection * player.speed;
+    const scrollSpeed = player.moveDirection * player.speed ;
 
     player.x = canvasWidth / 2; // Garder le joueur au centre
     platforms.forEach((platform) => platform.update(scrollSpeed));
