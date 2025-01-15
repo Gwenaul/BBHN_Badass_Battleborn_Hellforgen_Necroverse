@@ -4,6 +4,8 @@ import { Bullet } from "./bullet.js";
 
 const maxLives = 3;
 const canvas = document.getElementById("gameCanvas");
+canvas.width = 1900;
+canvas.height = 680;
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 
