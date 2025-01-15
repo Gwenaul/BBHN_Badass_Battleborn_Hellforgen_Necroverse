@@ -26,6 +26,8 @@ let xFront = 0;
 let yFront = canvas.height - frontImg.height;
 let xMid = 0;
 let yMid = canvas.height - midImg.height;
+let newXMid=xMid;
+let newXFront=xFront;
 
 
 
@@ -59,33 +61,37 @@ function gameLoop(timestamp) {
   lastTime = timestamp;
 
 
-let scrollSpeed = player.moveDirection*player.speed;
 
-xMid-=scrollSpeed;
-xFront-=scrollSpeed;
 
   // Efface l'écran
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  for(let a=0;a<2;a++)
-  ctx.drawImage(
-    midImg,
-    (xMid + midImg.width)*a,
-    yMid,
-    midImg.width,
-    midImg.height
-  );
+  if (player.x >= canvasWidth / 2) {
 
-  for (let a = 0; a < 3; a++)
-    ctx.drawImage(
-      frontImg,
-      (xFront + frontImg.width)*a,
-      yFront,
-      frontImg.width,
-      frontImg.height
-    );
-  
+    let scrollSpeed = player.moveDirection * player.speed;
 
+    newXMid -= scrollSpeed / 4;
+    newXFront -= scrollSpeed / 1.5;
+
+  }
+
+ for (let a = 0; a < 2; a++)
+   ctx.drawImage(
+     midImg,
+     newXMid + (xMid + midImg.width) * a,
+     yMid,
+     midImg.width,
+     midImg.height
+   );
+
+ for (let a = 0; a < 3; a++)
+   ctx.drawImage(
+     frontImg,
+     newXFront + (xFront + frontImg.width) * a,
+     yFront,
+     frontImg.width,
+     frontImg.height
+   );
 
   // Logique et rendu
   enemies = update(deltaTime, player, platforms, enemies);
