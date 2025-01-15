@@ -4,14 +4,19 @@
 
 export class Enemy {
   constructor(x, y, platform) {
+    this.isFrog = (Math.random() > 0.5);
     this.img = new Image();
-    this.img.src = "./assets/images/mechant.png";
+    this.img.src = this.isFrog
+      ? "./assets/images/frog.png"
+      : "./assets/images/mechant.png";
     this.x = x;
     this.y = y;
-    this.baseWidth = 40;
-    this.ratio = this.img.width / this.baseWidth;
-    this.width = this.img.width / this.ratio;
-    this.height = this.img.height / this.ratio;
+    this.baseWidth = this.isFrog? 80 : 60;
+    this.baseHeight = this.isFrog ? 80 : 60;
+    this.yRatio = this.img.height / this.baseHeight;
+    this.xRatio = this.img.width / this.baseWidth;
+    this.width = this.img.width / this.xRatio;
+    this.height = this.img.height / this.yRatio;
     this.speed = 2;
     this.direction = 1; // 1 pour droite, -1 pour gauche
     this.platform = platform; // Plateforme sur laquelle il patrouille
@@ -42,13 +47,16 @@ export class Enemy {
 
   draw(ctx) {
     let img = new Image();
-    img.src = "./assets/images/mechant.png";
+    img.src = this.isFrog
+      ? "./assets/images/frog.png":"./assets/images/mechant.png";
     ctx.drawImage(
       this.img,
-      this.x + this.baseWidth - this.img.width / this.ratio,
-      this.y + this.baseWidth - this.img.height / this.ratio,
-      this.img.width / this.ratio,
-      this.img.height / this.ratio
+      this.x + this.baseWidth - this.img.width / this.xRatio,
+      this.y +
+        (this.isFrog ? this.baseHeight / 3 : this.baseHeight/1.5) -
+        this.img.height / this.yRatio,
+      this.img.width / this.xRatio,
+      this.img.height / this.yRatio
     );
     // ctx.fillStyle = this.color;
     //ctx.fillRect(this.x, this.y, this.width, this.height);
