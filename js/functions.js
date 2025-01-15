@@ -3,6 +3,8 @@ import { Enemy } from "./enemy.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+canvas.width = 1900;
+canvas.height = 680;
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 const maxCoolDown = 100;
@@ -77,6 +79,7 @@ function tryPlatform(platformX, platforms) {
 
   return proposedHeight;
 }
+
 function update(deltaTime,player,platforms,enemies) {
   player.update(platforms);
   // Si le joueur dépasse le centre de l'écran

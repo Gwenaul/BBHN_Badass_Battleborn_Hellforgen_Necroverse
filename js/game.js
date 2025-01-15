@@ -5,11 +5,27 @@ import { Enemy } from "./enemy.js";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+canvas.width=1900;
+canvas.height=680;
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 const minDistPlatform = 100;
 let lastTime = 0;
 let worldOffsetX = 0;
+
+
+const midImg = new Image();
+const frontImg = new Image();
+midImg.src= "./assets/images/middle.png";
+midImg.width=canvas.width/2;
+midImg.height=canvas.height/2;
+frontImg.src = "./assets/images/front.png";
+frontImg.width = canvas.width/3;
+frontImg.height = canvas.height/3;
+let xFront = 0;
+let yFront = canvas.height - frontImg.height;
+let xMid = 0;
+let yMid = canvas.height - midImg.height;
 
 
 
@@ -43,10 +59,33 @@ function gameLoop(timestamp) {
   lastTime = timestamp;
 
 
+let scrollSpeed = player.moveDirection*player.speed;
 
+xMid-=scrollSpeed;
+xFront-=scrollSpeed;
 
   // Efface l'écran
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+  for(let a=0;a<2;a++)
+  ctx.drawImage(
+    midImg,
+    (xMid + midImg.width)*a,
+    yMid,
+    midImg.width,
+    midImg.height
+  );
+
+  for (let a = 0; a < 3; a++)
+    ctx.drawImage(
+      frontImg,
+      (xFront + frontImg.width)*a,
+      yFront,
+      frontImg.width,
+      frontImg.height
+    );
+  
+
 
   // Logique et rendu
   enemies = update(deltaTime, player, platforms, enemies);
