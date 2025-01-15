@@ -4,10 +4,14 @@
 
 export class Enemy {
   constructor(x, y, platform) {
+    this.img = new Image();
+    this.img.src = "./assets/images/mechant.png";
     this.x = x;
     this.y = y;
-    this.width = 40;
-    this.height = 40;
+    this.baseWidth = 40;
+    this.ratio = this.img.width / this.baseWidth;
+    this.width = this.img.width / this.ratio;
+    this.height = this.img.height / this.ratio;
     this.speed = 2;
     this.direction = 1; // 1 pour droite, -1 pour gauche
     this.platform = platform; // Plateforme sur laquelle il patrouille
@@ -37,18 +41,16 @@ export class Enemy {
   }
 
   draw(ctx) {
-   // ctx.fillStyle = this.color;
-   let img = new Image();
-   img.src =
-     "./assets/images/mechant.png";
-   let ratio = img.width/this.width;
-ctx.drawImage(
-  img,
-  this.x + this.width - img.width / ratio,
-  this.y + this.height - img.height / ratio,
-  img.width / ratio,
-  img.height / ratio
-);
+    let img = new Image();
+    img.src = "./assets/images/mechant.png";
+    ctx.drawImage(
+      this.img,
+      this.x + this.baseWidth - this.img.width / this.ratio,
+      this.y + this.baseWidth - this.img.height / this.ratio,
+      this.img.width / this.ratio,
+      this.img.height / this.ratio
+    );
+    // ctx.fillStyle = this.color;
     //ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }

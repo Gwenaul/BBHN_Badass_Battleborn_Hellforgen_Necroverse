@@ -9,14 +9,19 @@ const canvasHeight = canvas.height;
 
 export class Player {
   constructor(x, y) {
+    this.img = new Image();
+    this.img.src = "./assets/images/first_sprite_right.png";
     this.x = x;
     this.y = y;
     this.lives = maxLives;
+    this.isDead=false;
     this.coolDown = 0;
     this.mustStop = false;
     this.slowing = 0.85;
-    this.width = 50;
-    this.height = 50;
+    this.baseWidth = 50;
+    this.ratio = this.img.width / this.baseWidth;
+    this.width = this.img.width/this.ratio;
+    this.height = this.img.height/this.ratio;
     this.speed = 5;
     this.dy = 0; // Vitesse verticale (chute)
     this.gravity = 0.75; // Gravité
@@ -29,15 +34,18 @@ export class Player {
   }
   move(direction) {
     this.mustStop = false;
+    if(!this.isDead){ 
     if (direction === "left") this.moveDirection = -1;
     if (direction === "right") this.moveDirection = 1;
     this.orientation = this.moveDirection;
+    }
   }
 
   stop() {
     this.mustStop = true;
   }
   shoot() {
+        if(!this.isDead){ 
     this.bullets.push(
       new Bullet(
         this.orientation == -1 ? this.x : this.x + this.width,
@@ -46,7 +54,10 @@ export class Player {
       )
     );
   }
+  }
   jump() {
+        if(!this.isDead){ 
+
     if (this.isOnGround) {
       this.dy = this.jumpStrength; // Applique la force du saut
       this.isOnGround = false;
@@ -55,9 +66,9 @@ export class Player {
       this.hasDoubleJumped = true;
     }
   }
-
+  }
   dead() {
-    this.color = "red";
+    this.isDead = true;
   }
 
   update(platforms) {
@@ -117,15 +128,18 @@ export class Player {
     // ctx.fillStyle = this.color;
     // ctx.fillRect(this.x, this.y, this.width, this.height);
     // Dessine les projectiles
-     let img = new Image();
-     img.src = "./assets/images/first sprite.png";
-     let ratio = img.width / this.width;
+     this.img.src = this.isDead
+       ? "./assets/images/dead.png"
+       : this.orientation == 1
+       ? "./assets/images/first_sprite_right.png"
+       : "./assets/images/first_sprite_left.png";
+     
      ctx.drawImage(
-       img,
-       this.x + this.width - img.width / ratio,
-       this.y + this.height - img.height / ratio,
-       img.width / ratio,
-       img.height / ratio
+       this.img,
+       this.x + this.width - this.img.width / this.ratio,
+       this.y + this.height - this.img.height / this.ratio,
+       this.img.width / this.ratio,
+       this.img.height / this.ratio
      );
     this.bullets.forEach((bullet) => bullet.draw(ctx));
   }
