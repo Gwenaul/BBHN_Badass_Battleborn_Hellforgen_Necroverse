@@ -114,9 +114,19 @@ export class Player {
     textZone.textContent = "Vies : " + this.lives;
   }
   draw(ctx) {
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    // ctx.fillStyle = this.color;
+    // ctx.fillRect(this.x, this.y, this.width, this.height);
     // Dessine les projectiles
+     let img = new Image();
+     img.src = "./assets/images/first sprite.png";
+     let ratio = img.width / this.width;
+     ctx.drawImage(
+       img,
+       this.x + this.width - img.width / ratio,
+       this.y + this.height - img.height / ratio,
+       img.width / ratio,
+       img.height / ratio
+     );
     this.bullets.forEach((bullet) => bullet.draw(ctx));
   }
 }

@@ -40,8 +40,15 @@ export class Enemy {
    // ctx.fillStyle = this.color;
    let img = new Image();
    img.src =
-     "./assets/images/first  sprite.png";
-ctx.drawImage(img, this.x,this.y, this.width, this.height);
+     "./assets/images/mechant.png";
+   let ratio = img.width/this.width;
+ctx.drawImage(
+  img,
+  this.x + this.width - img.width / ratio,
+  this.y + this.height - img.height / ratio,
+  img.width / ratio,
+  img.height / ratio
+);
     //ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 }
