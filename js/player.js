@@ -69,6 +69,7 @@ export class Player {
   }
   dead() {
     this.isDead = true;
+    this.stop();
   }
 
   update(platforms) {

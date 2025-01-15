@@ -9,14 +9,14 @@ export class Enemy {
     this.img.src = this.isFrog
       ? "./assets/images/frog.png"
       : "./assets/images/mechant.png";
-    this.x = x;
-    this.y = y;
     this.baseWidth = this.isFrog? 80 : 60;
     this.baseHeight = this.isFrog ? 80 : 60;
     this.yRatio = this.img.height / this.baseHeight;
     this.xRatio = this.img.width / this.baseWidth;
     this.width = this.img.width / this.xRatio;
     this.height = this.img.height / this.yRatio;
+    this.x = x + this.baseWidth - this.img.width / this.xRatio;
+    this.y = y + (this.isFrog ? this.baseHeight / 3 : this.baseHeight/1.5) - this.img.height / this.yRatio;
     this.speed = 2;
     this.direction = 1; // 1 pour droite, -1 pour gauche
     this.platform = platform; // Plateforme sur laquelle il patrouille
@@ -51,10 +51,8 @@ export class Enemy {
       ? "./assets/images/frog.png":"./assets/images/mechant.png";
     ctx.drawImage(
       this.img,
-      this.x + this.baseWidth - this.img.width / this.xRatio,
-      this.y +
-        (this.isFrog ? this.baseHeight / 3 : this.baseHeight/1.5) -
-        this.img.height / this.yRatio,
+      this.x,
+      this.y,
       this.img.width / this.xRatio,
       this.img.height / this.yRatio
     );
