@@ -6,13 +6,12 @@ import { Enemy } from "./enemy.js";
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 canvas.width=1900;
-canvas.height=680;
+canvas.height=700;
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 const minDistPlatform = 100;
 let lastTime = 0;
 let worldOffsetX = 0;
-
 
 const midImg = new Image();
 const frontImg = new Image();
@@ -75,7 +74,7 @@ function gameLoop(timestamp) {
 
   }
 
- for (let a = 0; a < 2; a++)
+ for (let a = 0; a < 4; a++)
    ctx.drawImage(
      midImg,
      newXMid + (xMid + midImg.width) * a,
@@ -84,7 +83,7 @@ function gameLoop(timestamp) {
      midImg.height
    );
 
- for (let a = 0; a < 3; a++)
+ for (let a = 0; a < 6; a++)
    ctx.drawImage(
      frontImg,
      newXFront + (xFront + frontImg.width) * a,

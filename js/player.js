@@ -1,6 +1,4 @@
-
 import { Bullet } from "./bullet.js";
-
 
 const maxLives = 3;
 const canvas = document.getElementById("gameCanvas");
@@ -11,35 +9,44 @@ const canvasHeight = canvas.height;
 
 export class Player {
   constructor(x, y) {
-    this.img = new Image();
-    this.img.src = "./assets/images/first_sprite_right.png";
     this.x = x;
     this.y = y;
     this.lives = maxLives;
-    this.isDead=false;
+    this.isDead = false;
     this.coolDown = 0;
     this.mustStop = false;
     this.slowing = 0.85;
-    this.baseWidth = 50;
-    this.ratio = this.img.width / this.baseWidth;
-    this.width = this.img.width/this.ratio;
-    this.height = this.img.height/this.ratio;
+    this.baseWidth = 50; // Largeur par défaut
+    this.width = this.baseWidth; // Largeur temporaire
+    this.height = 50; // Hauteur temporaire
     this.speed = 5;
-    this.dy = 0; // Vitesse verticale (chute)
-    this.gravity = 0.75; // Gravité
-    this.jumpStrength = -17; // Force du saut
-    this.isOnGround = false; // Indicateur si le joueur est sur une plateforme
-    this.moveDirection = 0; // 1 pour droite, -1 pour gauche, 0 pour immobile
+    this.dy = 0;
+    this.gravity = 0.75;
+    this.jumpStrength = -17;
+    this.isOnGround = false;
+    this.moveDirection = 0;
     this.color = "blue";
     this.bullets = [];
-    this.orientation = 1; //par defaut regarde a droite
+    this.orientation = 1;
+
+    // Charger les images
+    this.img = new Image();
+    this.imgRight = new Image();
+    this.imgLeft = new Image();
+    this.imgDead = new Image();
+
+    this.imgRight.src = "./assets/images/first_sprite_right.png";
+    this.imgLeft.src = "./assets/images/first_sprite_left.png";
+    this.imgDead.src = "./assets/images/dead.png";
+
+    // Assurez-vous de définir les dimensions après le chargement des images
   }
   move(direction) {
     this.mustStop = false;
-    if(!this.isDead){ 
-    if (direction === "left") this.moveDirection = -1;
-    if (direction === "right") this.moveDirection = 1;
-    this.orientation = this.moveDirection;
+    if (!this.isDead) {
+      if (direction === "left") this.moveDirection = -1;
+      if (direction === "right") this.moveDirection = 1;
+      this.orientation = this.moveDirection;
     }
   }
 
@@ -47,27 +54,26 @@ export class Player {
     this.mustStop = true;
   }
   shoot() {
-        if(!this.isDead){ 
-    this.bullets.push(
-      new Bullet(
-        this.orientation == -1 ? this.x : this.x + this.width,
-        this.y + this.height / 2,
-        this.orientation
-      )
-    );
-  }
-  }
-  jump() {
-        if(!this.isDead){ 
-
-    if (this.isOnGround) {
-      this.dy = this.jumpStrength; // Applique la force du saut
-      this.isOnGround = false;
-    } else if (!this.hasDoubleJumped) {
-      this.dy = this.jumpStrength;
-      this.hasDoubleJumped = true;
+    if (!this.isDead) {
+      this.bullets.push(
+        new Bullet(
+          this.orientation == -1 ? this.x : this.x + this.width,
+          this.y + this.height / 2,
+          this.orientation
+        )
+      );
     }
   }
+  jump() {
+    if (!this.isDead) {
+      if (this.isOnGround) {
+        this.dy = this.jumpStrength; // Applique la force du saut
+        this.isOnGround = false;
+      } else if (!this.hasDoubleJumped) {
+        this.dy = this.jumpStrength;
+        this.hasDoubleJumped = true;
+      }
+    }
   }
   dead() {
     this.isDead = true;
@@ -126,24 +132,60 @@ export class Player {
 
     let textZone = document.getElementById("lives");
     textZone.textContent = "Vies : " + this.lives;
+
+    //Selection du bon sprite
+    if (this.isDead) {
+      this.ratio = this.imgDead.width / this.baseWidth;
+      this.width = this.imgDead.width / this.ratio;
+      this.height = this.imgDead.height / this.ratio;
+      this.img = this.imgDead;
+    } else {
+      if (this.orientation == 1) {
+        this.ratio = this.imgRight.width / this.baseWidth;
+        this.width = this.imgRight.width / this.ratio;
+        this.height = this.imgRight.height / this.ratio;
+        this.img = this.imgRight;
+      } else if (this.orientation == -1) {
+        this.ratio = this.imgLeft.width / this.baseWidth;
+        this.width = this.imgLeft.width / this.ratio;
+        this.height = this.imgLeft.height / this.ratio;
+        this.img = this.imgLeft;
+      }
+    }
   }
+
   draw(ctx) {
-    // ctx.fillStyle = this.color;
-    // ctx.fillRect(this.x, this.y, this.width, this.height);
-    // Dessine les projectiles
-     this.img.src = this.isDead
-       ? "./assets/images/dead.png"
-       : this.orientation == 1
-       ? "./assets/images/first_sprite_right.png"
-       : "./assets/images/first_sprite_left.png";
-     
-     ctx.drawImage(
-       this.img,
-       this.x + this.width - this.img.width / this.ratio,
-       this.y + this.height - this.img.height / this.ratio,
-       this.img.width / this.ratio,
-       this.img.height / this.ratio
-     );
+    console.log(this.imgDead.width);
+
+    if (this.img.width > 0) {
+      ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    } else {
+      // Si l'image n'est pas chargée, dessiner un rectangle bleu
+      ctx.fillStyle = this.color;
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+
+    // Dessiner les projectiles
     this.bullets.forEach((bullet) => bullet.draw(ctx));
   }
+
+  // draw(ctx) {
+  //   // ctx.fillStyle = this.color;
+  //   // ctx.fillRect(this.x, this.y, this.width, this.height);
+  //   // Dessine les projectiles
+  //   this.img.src = this.isDead
+  //     ? "./assets/images/dead.png"
+  //     : this.orientation == 1
+  //     ? this.imgRight
+  //     : this.imgLeft;
+
+  //   ctx.drawImage(
+  //     this.img,
+  //     this.x + this.width - this.img.width / this.ratio,
+  //     this.y + this.height - this.img.height / this.ratio,
+  //     this.img.width / this.ratio,
+  //     this.img.height / this.ratio
+  //   );
+  //   this.bullets.forEach((bullet) => bullet.draw(ctx));
+  // }
 }

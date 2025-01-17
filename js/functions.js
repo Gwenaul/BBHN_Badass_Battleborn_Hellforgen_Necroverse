@@ -41,7 +41,7 @@ function canKill(enemies,player) {
 }
 
 function generatePlatform(platforms) {
-  const platformWidth = Math.random() * 200 + 100; // Largeur entre 50 et 250 pixels
+  const platformWidth = Math.random() * 200 + 100; // Largeur entre 100 et 250 pixels
   const platformHeight = 20;
   const platformX = canvasWidth + Math.random() * canvasWidth; // Position hors écran (à droite)
   const platformY = tryPlatform(platformX, platforms); // Hauteur aléatoire (évite le bas de l'écran)
